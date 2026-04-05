@@ -1,0 +1,6 @@
+Seeding users...
+Seeding transactions...
+Done! Users created:
+  admin / Admin@123   (role: admin)
+  analyst / Analyst@123 (role: analyst)
+  viewer / Viewer@123  (role: viewer)
