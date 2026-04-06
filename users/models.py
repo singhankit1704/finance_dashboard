@@ -38,6 +38,8 @@ class User(AbstractUser):
 
     @property
     def is_analyst(self):
+        # Admins inherit analyst privileges to avoid role-checking
+        # both roles separately across the codebase
         return self.role in [self.ROLE_ANALYST, self.ROLE_ADMIN]
 
     @property

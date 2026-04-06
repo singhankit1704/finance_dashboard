@@ -37,7 +37,8 @@ class TransactionListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = Transaction.objects.filter(is_deleted=False)
-        # Admins see all records; others see only their own
+        # Admins have global visibility; all other roles
+        # are scoped to their own records only
         if not self.request.user.is_admin:
             qs = qs.filter(user=self.request.user)
         return qs

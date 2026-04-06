@@ -1,9 +1,17 @@
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-finance-dashboard-secret-key-zorvyn-assignment'
-DEBUG = True
+
+# Sensitive config loaded from .env — never hardcode these
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -13,9 +21,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Third party
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
+    # Local apps
     'users',
     'transactions',
 ]
@@ -32,10 +42,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'finance_dashboard.urls'
 
-TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates','DIRS': [],'APP_DIRS': True,'OPTIONS': {'context_processors': ['django.template.context_processors.debug','django.template.context_processors.request','django.contrib.auth.context_processors.auth','django.contrib.messages.context_processors.messages',],},},]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 WSGI_APPLICATION = 'finance_dashboard.wsgi.application'
 
+# SQLite for development — switch to PostgreSQL in production
+# by changing ENGINE and adding NAME, USER, PASSWORD, HOST, PORT
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -46,9 +72,13 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Swap default User with our custom role-aware model
 AUTH_USER_MODEL = 'users.User'
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -61,6 +91,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
+        # All endpoints require authentication by default
+        # Individual views override this with role-specific permissions
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_FILTER_BACKENDS': [
@@ -76,6 +108,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    # Refresh token rotates on every use for better security
     'ROTATE_REFRESH_TOKENS': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
