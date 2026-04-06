@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # Local apps
     'users',
     'transactions',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -111,4 +112,15 @@ SIMPLE_JWT = {
     # Refresh token rotates on every use for better security
     'ROTATE_REFRESH_TOKENS': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Finance Dashboard API',
+    'DESCRIPTION': 'Role-based backend for a finance dashboard system.',
+    'VERSION': '1.0.0',
+}
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
